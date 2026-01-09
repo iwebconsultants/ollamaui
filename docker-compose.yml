@@ -1,4 +1,4 @@
-name: 'ollama-open-webui'
+name: "ollama-open-webui"
 
 services:
   ollama:
@@ -13,9 +13,9 @@ services:
       - ollama:/root/.ollama
       - ./ollama_entrypoint.sh:/entrypoint.sh
     environment:
-      - 'OLLAMA_MAX_LOADED_MODELS=4'
-      - 'OLLAMA_NUM_PARALLEL=4'
-      - 'OLLAMA_KEEP_ALIVE=-1'
+      - "OLLAMA_MAX_LOADED_MODELS=4"
+      - "OLLAMA_NUM_PARALLEL=4"
+      - "OLLAMA_KEEP_ALIVE=-1"
     entrypoint: ["/entrypoint.sh"]
 
   open-webui:
@@ -28,7 +28,17 @@ services:
     ports:
       - 3008:8080
     environment:
-      - 'OLLAMA_BASE_URL=http://ollama:11434'
+      - "OLLAMA_BASE_URL=http://ollama:11434"
+      - "WEBUI_URL=https://ollamaui.iwebx.com.au"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ollamaui-webui.rule=Host(`ollamaui.iwebx.com.au`)"
+      - "traefik.http.routers.ollamaui-webui.entrypoints=websecure"
+      - "traefik.http.routers.ollamaui-webui.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ollamaui-webui.loadbalancer.server.port=8080"
+    networks:
+      - default
+      - dokploy-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
@@ -36,3 +46,7 @@ services:
 volumes:
   ollama:
   open-webui:
+
+networks:
+  dokploy-network:
+    external: true
