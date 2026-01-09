@@ -16,6 +16,15 @@ services:
       - "OLLAMA_MAX_LOADED_MODELS=4"
       - "OLLAMA_NUM_PARALLEL=4"
       - "OLLAMA_KEEP_ALIVE=-1"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ollama-api.rule=Host(`ollama.iwebx.com.au`)"
+      - "traefik.http.routers.ollama-api.entrypoints=websecure"
+      - "traefik.http.routers.ollama-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ollama-api.loadbalancer.server.port=11434"
+    networks:
+      - default
+      - dokploy-network
     entrypoint: ["/entrypoint.sh"]
 
   open-webui:
